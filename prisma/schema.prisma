@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status{
+  INACTIVE
+  ACTIVE
+  SUSPENDED
+}
+
+model User{
+  id Int @id @default(autoincrement())
+  firstName String
+  lastName String?
+  username String @unique
+  phoneNumber String @unique
+  profileImg String?
+  hash String
+  salt String
+  status Status @default(INACTIVE)
+  asSuperAdmin Group[]
+  asMember UserGroup[]
+  asAdmin AdminGroup[]
+  userChat UserChat[]
+  messages Message[]
+}
+
+model Group{
+  id Int @id @default(autoincrement())
+  name String @unique
+  description String?
+  link String @unique
+  profileImg String?
+  superAdmin User @relation(fields: [superAdminId],references: [id])
+  superAdminId Int
+  members UserGroup[]
+  admins AdminGroup[]
+  chat Chat?
+}
+
+model UserGroup{
+  @@id([userId,groupId])
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  group Group @relation(fields: [groupId],references: [id])
+  groupId Int
+  bocked Boolean @default(false)
+}
+
+
+model AdminGroup{
+  @@id([userId,groupId])
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  group Group @relation(fields: [groupId],references: [id])
+  groupId Int
+  permissions UserGroupPermission[]
+}
+model Permission{
+  id Int @id @default(autoincrement())
+  value String
+  adminGroup UserGroupPermission[]
+}
+
+model UserGroupPermission{
+  @@id([userId,groupId])
+  adminGroup AdminGroup @relation(fields: [userId,groupId],references: [userId,groupId])
+  userId Int
+  groupId Int
+  permission Permission @relation(fields: [permissionId],references: [id])
+  permissionId Int
+}
+
+model Chat{
+  id Int @id @default(autoincrement())
+  group Group? @relation(fields: [groupId],references: [id])
+  groupId Int? @unique
+  userChat UserChat[]
+  messages Message[]
+}
+model UserChat{
+  @@id([userId,chatId])
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  chat Chat @relation(fields: [chatId],references: [id])
+  chatId Int
+}
+
+enum MessageType{
+  TEXT
+  AUDIO 
+  VIDEO
+}
+model Message{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [sender],references: [id])
+  sender Int
+  chat Chat @relation(fields: [chatId],references: [id])
+  chatId Int
+  timeStamp DateTime
+  updatedAt DateTime
+  text String
+  image String
+  video String
+  audio String
+  type MessageType
+  seen Boolean @default(false)
+}
