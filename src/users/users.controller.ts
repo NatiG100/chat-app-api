@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,Query } from '@nestjs
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 
 @Controller('users')
 export class UsersController {
@@ -13,12 +14,12 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Query() query:any) {
+  findAll(@Query() query:APIFeaturesDto) {
     return this.usersService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Query() query:any) {
+  findOne(@Param('id') id: string, @Query() query:APIFeaturesSingleDto) {
     return this.usersService.findOne(+id,query);
   }
 

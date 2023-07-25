@@ -4,8 +4,8 @@ export class CreateUserDto {
     @IsString({message:"First name should be a string value"})
     firstName:string
     
-    @IsString()
     @IsOptional()
+    @IsString()
     lastName?:string
 
     @IsString()
