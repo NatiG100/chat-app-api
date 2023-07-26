@@ -5,13 +5,21 @@ import { PrismaService } from 'src/prisma.service';
 import { APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { User } from '@prisma/client';
 import { UtilService } from 'src/util.service';
+import { uploadFile } from '@uploadcare/upload-client';
+import { UploadcareSimpleAuthSchema, deleteFile, storeFile } from '@uploadcare/rest-client';
+import { ConfigService } from '@nestjs/config';
 
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma:PrismaService,private util:UtilService){}
+  constructor(private prisma:PrismaService,private util:UtilService,private config:ConfigService){}
+  uploadCareAuthSchema = new UploadcareSimpleAuthSchema({
+    publicKey:this.config.get("UPLOADCARE_PUBLIC"),
+    secretKey:this.config.get("UPLOADCARE_SECRETE"),
+  })
   async create({password,...createUserDto}: CreateUserDto) {
-      return this.prisma.user.create({data:{...createUserDto,salt:"salt",hash:"hash"}});
+      const {salt,hash} = this.util.hash(password);
+      return this.prisma.user.create({data:{...createUserDto,salt,hash}});
   }
 
   //takes a select object and makes sure that it contains only the avaliable fields
@@ -65,8 +73,29 @@ export class UsersService {
     return this.exclude(user,['hash','salt'])
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, {profileImg,...otherUpdateDto}: UpdateUserDto,file:Express.Multer.File) {
+    //if user doesn't esist throw an error
+    const user = await this.prisma.user.findUnique({where:{id},select:{id:true,profileImg}})
+    if(!user){
+      throw new HttpException({
+        status:HttpStatus.NOT_FOUND,
+        error:"User with the provided id not found"
+      },HttpStatus.NOT_FOUND,)
+    }
+    //upload the image
+    const uploadResult = await uploadFile(file.buffer,{publicKey:'07af5eee39423b7e62d5',store:false});
+
+    //update the user table
+    const updatedUser = await this.prisma.user.update({where:{id},data:{...otherUpdateDto,profileImg:uploadResult.uuid}});
+
+    //store the image permanently
+    const storeResult = await storeFile({uuid:uploadResult.uuid},{authSchema:this.uploadCareAuthSchema});
+
+    //delete image if it exists
+    if(user.profileImg){
+      await deleteFile({uuid:user.profileImg},{authSchema:this.uploadCareAuthSchema})  
+    }
+    return updatedUser;
   }
   
   async remove(id: number) {
