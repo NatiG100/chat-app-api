@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete,Query, UseInterceptors, UploadedFile, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangeUserStatusDto, UpdateUserDto } from './dto/update-user.dto';
 import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {uploadFile} from '@uploadcare/upload-client'
@@ -37,6 +37,11 @@ export class UsersController {
   ) file:Express.Multer.File) {
     
     return this.usersService.update(+id, updateUserDto,file);
+  }
+
+  @Patch(':id/status')
+  async changeStatus(@Param('id') id:string,@Body() status: ChangeUserStatusDto){
+    return this.usersService.changeStatus(+id,status)
   }
 
   @Delete(':id')

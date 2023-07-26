@@ -17,8 +17,8 @@ export class UtilService{
           query.select.forEach((selectItem)=>{features.select[selectItem]=true});
         }
         if(query.limit&&query.page){
-            features.take = query.limit;
-            features.skip = query.limit*query.page;
+            features.take = 1*query.limit;
+            features.skip = 1*query.limit*query.page;
         }
         return features;
     }

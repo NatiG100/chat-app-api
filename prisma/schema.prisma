@@ -5,6 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")

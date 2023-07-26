@@ -1,6 +1,6 @@
 import { Injectable,HttpException,HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangeUserStatusDto, UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import { APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { User } from '@prisma/client';
@@ -96,6 +96,22 @@ export class UsersService {
       await deleteFile({uuid:user.profileImg},{authSchema:this.uploadCareAuthSchema})  
     }
     return updatedUser;
+  }
+  async changeStatus(id:number,statusDto:ChangeUserStatusDto){
+    const user = await this.prisma.user.findUnique({where:{id},select:{status:true}});
+    if(!user){
+      throw new HttpException({
+        status:HttpStatus.NOT_FOUND,
+        error:"User with the provided id not found"
+      },HttpStatus.NOT_FOUND,)
+    }
+    if(user.status==="INACTIVE"){
+      throw new HttpException({
+        status:HttpStatus.FORBIDDEN,
+        error:"The user is inactive"
+      },HttpStatus.FORBIDDEN,)
+    }
+    return this.prisma.user.update({where:{id},data:{status:statusDto.status}});
   }
   
   async remove(id: number) {
