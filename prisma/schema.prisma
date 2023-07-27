@@ -55,9 +55,9 @@ model Group{
 
 model UserGroup{
   @@id([userId,groupId])
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   userId Int
-  group Group @relation(fields: [groupId],references: [id])
+  group Group @relation(fields: [groupId],references: [id],onDelete: Cascade)
   groupId Int
   bocked Boolean @default(false)
 }
@@ -65,9 +65,9 @@ model UserGroup{
 
 model AdminGroup{
   @@id([userId,groupId])
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   userId Int
-  group Group @relation(fields: [groupId],references: [id])
+  group Group @relation(fields: [groupId],references: [id],onDelete: Cascade)
   groupId Int
   permissions UserGroupPermission[]
 }
@@ -79,10 +79,10 @@ model Permission{
 
 model UserGroupPermission{
   @@id([userId,groupId])
-  adminGroup AdminGroup @relation(fields: [userId,groupId],references: [userId,groupId])
+  adminGroup AdminGroup @relation(fields: [userId,groupId],references: [userId,groupId],onDelete: Cascade)
   userId Int
   groupId Int
-  permission Permission @relation(fields: [permissionId],references: [id])
+  permission Permission @relation(fields: [permissionId],references: [id],onDelete: Cascade)
   permissionId Int
 }
 
@@ -97,7 +97,7 @@ model UserChat{
   @@id([userId,chatId])
   user User @relation(fields: [userId],references: [id])
   userId Int
-  chat Chat @relation(fields: [chatId],references: [id])
+  chat Chat @relation(fields: [chatId],references: [id],onDelete: Cascade)
   chatId Int
 }
 
@@ -110,7 +110,7 @@ model Message{
   id Int @id @default(autoincrement())
   user User @relation(fields: [sender],references: [id])
   sender Int
-  chat Chat @relation(fields: [chatId],references: [id])
+  chat Chat @relation(fields: [chatId],references: [id],onDelete: Cascade)
   chatId Int
   timeStamp DateTime
   updatedAt DateTime
