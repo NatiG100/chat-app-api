@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, UseGuards, Query } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
+import { APIFeaturesDto } from 'src/dto/APIFeaturesDto';
 
 @Controller('groups')
 export class GroupsController {
@@ -15,8 +16,8 @@ export class GroupsController {
   }
 
   @Get()
-  findAll() {
-    return this.groupsService.findAll();
+  findAll(@Query() query:APIFeaturesDto) {
+    return this.groupsService.findAll(query);
   }
 
   @Get(':id')
