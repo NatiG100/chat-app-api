@@ -90,7 +90,14 @@ export class GroupsService {
     return updatedGroup;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} group`;
+  async remove(id: number) {
+    const group = await this.prisma.group.findUnique({where:{id}});
+    if(!group){
+      throw new HttpException({
+        status:HttpStatus.NOT_FOUND,
+        error:"Group with the provided id not found"
+      },HttpStatus.NOT_FOUND,)
+    }
+    return this.prisma.group.delete({where:{id}})
   }
 }
