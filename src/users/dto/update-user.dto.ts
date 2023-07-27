@@ -1,8 +1,9 @@
 import { PartialType,OmitType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(OmitType(CreateUserDto,["password"])) {
+    @IsOptional()
     profileImg?:any
 }
 export class ChangeUserStatusDto{

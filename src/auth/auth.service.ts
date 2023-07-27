@@ -9,6 +9,7 @@ export class AuthService {
 
     async validateUser(username:string,pass:string):Promise<any>{
         const user = await this.prisma.user.findUnique({where:{username}});
+        if(!user){throw new UnauthorizedException();}
         if(this.util.check(pass,user.hash,user.salt)){
             const {hash,salt,...result} = user;
             return result;
@@ -35,5 +36,22 @@ export class AuthService {
         //generate new salt and hash
         const {hash,salt} = this.util.hash(newPassword);
         await this.prisma.user.update({where:{id},data:{hash,salt}})
+    }
+    async activate(id:number){
+        const user = await this.prisma.user.findUnique({where:{id}})
+        switch(user.status){
+            case 'ACTIVE':
+                throw new HttpException({
+                    status:HttpStatus.BAD_REQUEST,
+                    error:"This account is already active"
+                },HttpStatus.FORBIDDEN,)
+            case 'SUSPENDED':
+                throw new UnauthorizedException();
+            case 'INACTIVE':
+                await this.prisma.user.update({where:{id},data:{status:'ACTIVE'}});
+                break;
+            default:
+                throw new HttpException("Internal Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

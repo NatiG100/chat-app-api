@@ -73,7 +73,7 @@ export class UsersService {
     return this.exclude(user,['hash','salt'])
   }
 
-  async update(id: number, {profileImg,...otherUpdateDto}: UpdateUserDto,file:Express.Multer.File) {
+  async update(id: number, {profileImg,...otherUpdateDto}: UpdateUserDto,file?:Express.Multer.File) {
     //if user doesn't esist throw an error
     const user = await this.prisma.user.findUnique({where:{id},select:{id:true,profileImg}})
     if(!user){
@@ -82,18 +82,24 @@ export class UsersService {
         error:"User with the provided id not found"
       },HttpStatus.NOT_FOUND,)
     }
-    //upload the image
-    const uploadResult = await uploadFile(file.buffer,{publicKey:'07af5eee39423b7e62d5',store:false});
+    let updatedUser:User;
+    if(file){
 
-    //update the user table
-    const updatedUser = await this.prisma.user.update({where:{id},data:{...otherUpdateDto,profileImg:uploadResult.uuid}});
-
-    //store the image permanently
-    const storeResult = await storeFile({uuid:uploadResult.uuid},{authSchema:this.uploadCareAuthSchema});
-
-    //delete image if it exists
-    if(user.profileImg){
-      await deleteFile({uuid:user.profileImg},{authSchema:this.uploadCareAuthSchema})  
+      //upload the image
+      const uploadResult = await uploadFile(file.buffer,{publicKey:'07af5eee39423b7e62d5',store:false});
+  
+      //update the user table
+      updatedUser = await this.prisma.user.update({where:{id},data:{...otherUpdateDto,profileImg:uploadResult.uuid}});
+  
+      //store the image permanently
+      const storeResult = await storeFile({uuid:uploadResult.uuid},{authSchema:this.uploadCareAuthSchema});
+  
+      //delete image if it exists
+      if(user.profileImg){
+        await deleteFile({uuid:user.profileImg},{authSchema:this.uploadCareAuthSchema})  
+      }
+    }else{
+      updatedUser = await this.prisma.user.update({where:{id},data:otherUpdateDto});
     }
     return updatedUser;
   }

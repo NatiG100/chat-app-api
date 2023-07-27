@@ -1,51 +1,86 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Query, UseInterceptors, UploadedFile, ParseFilePipe, FileTypeValidator, MaxFileSizeValidator } from '@nestjs/common';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Body, 
+  Patch, 
+  Param, 
+  Delete,
+  Query, 
+  UseInterceptors, 
+  UploadedFile, 
+  ParseFilePipe, 
+  FileTypeValidator, 
+  MaxFileSizeValidator,
+  UseGuards, 
+  Request,
+  Next,
+  Res, 
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ChangeUserStatusDto, UpdateUserDto } from './dto/update-user.dto';
 import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {uploadFile} from '@uploadcare/upload-client'
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
+import { NextFunction, Response } from 'express';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  //register
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  //fetch many users
   @Get()
   findAll(@Query() query:APIFeaturesDto) {
     return this.usersService.findAll(query);
   }
 
+  //fetch one user
   @Get(':id')
   findOne(@Param('id') id: string, @Query() query:APIFeaturesSingleDto) {
     return this.usersService.findOne(+id,query);
   }
 
-  @Patch(':id')
+  //update self
+  @UseGuards(AuthenticatedGuard)
+  @Patch('')
   @UseInterceptors(FileInterceptor('profileImg'))
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @UploadedFile(
+  async update(@Request() req:any, @Body() updateUserDto: UpdateUserDto, @UploadedFile(
     new ParseFilePipe({
       validators: [
         new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 4 }),
       ],
-    }),
-  ) file:Express.Multer.File) {
-    
-    return this.usersService.update(+id, updateUserDto,file);
+      fileIsRequired:false
+    })
+  ) file?:Express.Multer.File) {
+    return this.usersService.update(req.session.passport.user.id, updateUserDto,file);
   }
 
   @Patch(':id/status')
   async changeStatus(@Param('id') id:string,@Body() status: ChangeUserStatusDto){
     return this.usersService.changeStatus(+id,status)
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  
+  //delete account
+  @UseGuards(AuthenticatedGuard)
+  @Delete('')
+  remove(@Request() req:any,@Next() next:NextFunction, @Res() res:Response) {
+    const result  = this.usersService.remove(req.session.passport.user.id);
+    req.logOut(function(error:Error){
+        if(error){
+            return next(error);
+        }
+        res.json({
+          result,
+        })
+    });
   }
 }

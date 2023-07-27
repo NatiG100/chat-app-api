@@ -5,30 +5,30 @@ import { ChangePasswordDto, LoginDto } from "./authDto";
 import { AuthenticatedGuard } from "./authenticated.guard";
 import { NextFunction, Response } from "express";
 
-@Controller()
+@Controller("auth")
 export class AuthController{
     constructor(private readonly authService:AuthService){}
     @UseGuards(LocalAuthGuard)
-    @Post('auth')
+    @Post()
     async login(@Body() body:LoginDto, @Request() req:any){
         return req.user;
     }
 
     @UseGuards(AuthenticatedGuard)
-    @Get('auth')
+    @Get()
     whoAmI(@Request() req:any){
         return this.authService.me(req.user.id);
     }
 
     @UseGuards(AuthenticatedGuard)
-    @Patch('auth')
+    @Patch()
     async changePassword(@Request() req:any,@Body() changeDto:ChangePasswordDto){
         await this.authService.changePassword(req.user.id,changeDto)
         return {message:"Password successfully changed"}
     }
     
     @UseGuards(AuthenticatedGuard)
-    @Delete('auth')
+    @Delete()
     logout(@Request() req:any, @Next() next:NextFunction, @Res() res:Response){
         req.logOut(function(error:Error){
             if(error){
@@ -39,5 +39,12 @@ export class AuthController{
             })
         });
         return {message:"Successfully loged out"}
+    }
+
+    @UseGuards(AuthenticatedGuard)
+    @Patch('activate')
+    async activate(@Request() req:any){
+        await this.authService.activate(req.user.id)
+        return {message:"Your account has been activated"}
     }
 }
