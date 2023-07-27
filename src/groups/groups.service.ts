@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { UtilService } from 'src/util.service';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma.service';
-import { APIFeaturesDto } from 'src/dto/APIFeaturesDto';
+import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { Group } from '@prisma/client';
 
 @Injectable()
@@ -41,8 +41,17 @@ export class GroupsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  async findOne(id: number, query:APIFeaturesSingleDto) {
+    let {select} = this.util.apiFeaturesSingle(query);
+    select = this.sanitizeSelect(select);
+    const group = await this.prisma.group.findUnique({where:{id},select});
+    if(!group){
+      throw new HttpException({
+        status:HttpStatus.NOT_FOUND,
+        error:"Group with the provided id is not found"
+      },HttpStatus.NOT_FOUND,)
+    }
+    return group;
   }
 
   update(id: number, updateGroupDto: UpdateGroupDto) {

@@ -3,7 +3,7 @@ import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
-import { APIFeaturesDto } from 'src/dto/APIFeaturesDto';
+import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 
 @Controller('groups')
 export class GroupsController {
@@ -21,8 +21,8 @@ export class GroupsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.groupsService.findOne(+id);
+  findOne(@Param('id') id: string, @Query() query:APIFeaturesSingleDto) {
+    return this.groupsService.findOne(+id,query);
   }
 
   @Patch(':id')
