@@ -6,10 +6,16 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma.service';
 import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { Group } from '@prisma/client';
+import { uploadFile } from '@uploadcare/upload-client';
+import { UploadcareSimpleAuthSchema, deleteFile, storeFile } from '@uploadcare/rest-client';
 
 @Injectable()
 export class GroupsService {
   constructor(private prisma:PrismaService,private util:UtilService,private config:ConfigService){}
+  uploadCareAuthSchema = new UploadcareSimpleAuthSchema({
+    publicKey:this.config.get("UPLOADCARE_PUBLIC"),
+    secretKey:this.config.get("UPLOADCARE_SECRETE"),
+  })
   create(createGroupDto: CreateGroupDto,myId:number) {
     return this.prisma.group.create({data:{...createGroupDto,superAdminId:myId}});
   }
@@ -41,7 +47,7 @@ export class GroupsService {
     }
   }
 
-  async findOne(id: number, query:APIFeaturesSingleDto) {
+  async findOne(id: number, query:APIFeaturesSingleDto,) {
     let {select} = this.util.apiFeaturesSingle(query);
     select = this.sanitizeSelect(select);
     const group = await this.prisma.group.findUnique({where:{id},select});
@@ -54,8 +60,34 @@ export class GroupsService {
     return group;
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async update(id: number, {profileImg,name,description}: UpdateGroupDto,file?:Express.Multer.File) {
+    //if group doesn't esist throw an error
+    const group = await this.prisma.group.findUnique({where:{id},select:{id:true,profileImg}})
+    if(!group){
+      throw new HttpException({
+        status:HttpStatus.NOT_FOUND,
+        error:"Group with the provided id is not found"
+      },HttpStatus.NOT_FOUND,)
+    }
+    let updatedGroup:Group;
+    if(file){
+      //upload the image
+      const uploadResult = await uploadFile(file.buffer,{publicKey:'07af5eee39423b7e62d5',store:false});
+  
+      //update the group table
+      updatedGroup = await this.prisma.group.update({where:{id},data:{name,description,profileImg:uploadResult.uuid}});
+  
+      //store the image permanently
+      const storeResult = await storeFile({uuid:uploadResult.uuid},{authSchema:this.uploadCareAuthSchema});
+  
+      //delete image if it exists
+      if(group.profileImg){
+        await deleteFile({uuid:group.profileImg},{authSchema:this.uploadCareAuthSchema})  
+      }
+    }else{
+      updatedGroup = await this.prisma.group.update({where:{id},data:{name,description}});
+    }
+    return updatedGroup;
   }
 
   remove(id: number) {

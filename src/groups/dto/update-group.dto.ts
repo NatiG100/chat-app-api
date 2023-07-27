@@ -1,8 +1,17 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { CreateGroupDto } from './create-group.dto';
-import { IsOptional } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
+import { Optional } from '@nestjs/common';
 
-export class UpdateGroupDto extends PartialType(CreateGroupDto) {
+export class UpdateGroupDto {
     @IsOptional()
     profileImg?:any
+    
+    @IsOptional()
+    @IsString()
+    name:string
+
+    @IsOptional()
+    @IsString()
+    description?:string
 }
