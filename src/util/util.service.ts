@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { APIFeaturesDto, APIFeaturesSingleDto } from "./dto/APIFeaturesDto";
+import { APIFeaturesDto, APIFeaturesSingleDto } from "../dto/APIFeaturesDto";
 import {randomBytes,pbkdf2Sync} from 'crypto'
 
 @Injectable()

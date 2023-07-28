@@ -1,10 +1,10 @@
 import { Injectable,HttpException,HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ChangeUserStatusDto, UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { User } from '@prisma/client';
-import { UtilService } from 'src/util.service';
+import { UtilService } from 'src/util/util.service';
 import { uploadFile } from '@uploadcare/upload-client';
 import { UploadcareSimpleAuthSchema, deleteFile, storeFile } from '@uploadcare/rest-client';
 import { ConfigService } from '@nestjs/config';

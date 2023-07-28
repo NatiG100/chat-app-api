@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { UtilService } from 'src/util.service';
+import { UtilService } from 'src/util/util.service';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { Group } from '@prisma/client';
 import { uploadFile } from '@uploadcare/upload-client';

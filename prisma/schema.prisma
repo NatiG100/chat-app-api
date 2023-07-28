@@ -59,7 +59,7 @@ model UserGroup{
   userId Int
   group Group @relation(fields: [groupId],references: [id],onDelete: Cascade)
   groupId Int
-  bocked Boolean @default(false)
+  blocked Boolean @default(false)
 }
 
 

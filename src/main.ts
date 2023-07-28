@@ -1,10 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -58,11 +59,16 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session())
 
+  const { httpAdapter } = app.get(HttpAdapterHost);
+
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+  //add exception filters
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     transformOptions: {enableImplicitConversion: true},
     forbidNonWhitelisted: true
   }))
+
   await app.listen(3000);
 }
 bootstrap();

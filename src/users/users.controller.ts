@@ -15,14 +15,14 @@ import {
   UseGuards, 
   Request,
   Next,
-  Res, 
+  Res,
+  UseFilters, 
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ChangeUserStatusDto, UpdateUserDto } from './dto/update-user.dto';
 import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {uploadFile} from '@uploadcare/upload-client'
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 import { NextFunction, Response } from 'express';
 

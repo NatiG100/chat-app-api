@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
-import { UtilService } from 'src/util.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UtilService } from 'src/util/util.service';
 import { ChangePasswordDto } from './authDto';
 
 @Injectable()
