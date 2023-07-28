@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { UtilService } from 'src/util/util.service';
@@ -91,6 +91,22 @@ export class GroupsService {
       updatedGroup = await this.prisma.group.update({where:{id},data:{name,description}});
     }
     return updatedGroup;
+  }
+
+  async transfer(id:number,to:number){
+    const group = await this.prisma.group.findUnique({where:{id},select:{id:true,superAdminId:true}})
+    if(!group){
+      throw new NotFoundException("The group with the provided id doesn't exist")
+    }
+    if(group.superAdminId===to){
+      throw new BadRequestException("The user is already the super-admin of this group.")
+    }
+    const userGroup = await this.prisma.userGroup.findUnique({where:{userId_groupId:{groupId:id,userId:to}}})
+    if((!userGroup) || userGroup.blocked){
+      throw new BadRequestException("Either the user is not a member of this group or he/she is blocked.")
+    }
+    await this.prisma.group.update({where:{id},data:{superAdminId:to}});
+    return {message:"You have successfully transferred the ownership of the user."}
   }
 
   async remove(id: number) {

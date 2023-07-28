@@ -41,6 +41,11 @@ export class GroupsController {
     return this.groupsService.update(+id, updateGroupDto,file);
   }
 
+  @Patch(':id/transfer')
+  transfer(@Param('id') id:string,@Query('to') to:string){
+    return this.groupsService.transfer(+id,+to);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(+id);
