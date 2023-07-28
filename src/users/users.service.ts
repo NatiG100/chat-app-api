@@ -19,10 +19,11 @@ export class UsersService {
   })
   async create({password,...createUserDto}: CreateUserDto) {
       const {salt,hash} = this.util.hash(password);
-      return this.prisma.user.create({data:{...createUserDto,salt,hash}});
+      const user = await this.prisma.user.create({data:{...createUserDto,salt,hash}});
+      return this.exclude(user,["hash","salt"])
   }
 
-  //takes a select object and makes sure that it contains only the avaliable fields
+  //takes a select object and makes sure that it contains only the available fields
   private sanitizeSelect(select:object){
     let userKeys:(keyof User) []=["id","username","firstName","lastName","phoneNumber",'profileImg',"status"];
     Object.keys(select).forEach((key)=>{
@@ -101,7 +102,7 @@ export class UsersService {
     }else{
       updatedUser = await this.prisma.user.update({where:{id},data:otherUpdateDto});
     }
-    return updatedUser;
+    return this.exclude(updatedUser,["hash","salt"]);
   }
   async changeStatus(id:number,statusDto:ChangeUserStatusDto){
     const user = await this.prisma.user.findUnique({where:{id},select:{status:true}});
@@ -117,7 +118,8 @@ export class UsersService {
         error:"The user is inactive"
       },HttpStatus.FORBIDDEN,)
     }
-    return this.prisma.user.update({where:{id},data:{status:statusDto.status}});
+    const updatedUser = await this.prisma.user.update({where:{id},data:{status:statusDto.status}});
+    return this.exclude(updatedUser,["hash","salt"]);
   }
   
   async remove(id: number) {
@@ -128,6 +130,7 @@ export class UsersService {
         error:"User with the provided id not found"
       },HttpStatus.NOT_FOUND,)
     }
-    return this.prisma.user.delete({where:{id}})
+    const deletedUser = await this.prisma.user.delete({where:{id}})
+    this.exclude(deletedUser,["hash","salt"])
   }
 }

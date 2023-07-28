@@ -17,9 +17,12 @@ export class GroupsService {
     secretKey:this.config.get("UPLOADCARE_SECRETE"),
   })
   create(createGroupDto: CreateGroupDto,myId:number) {
-    return this.prisma.group.create({data:{...createGroupDto,superAdminId:myId}});
+    return this.prisma.$transaction(async(tx)=>{
+      const group = await tx.group.create({data:{...createGroupDto,superAdminId:myId}});
+      await tx.userGroup.create({data:{groupId:group.id,userId:myId}})
+    })
   }
-  //takes a select object and makes sure that it contains only the avaliable fields
+  //takes a select object and makes sure that it contains only the available fields
   private sanitizeSelect(select:object){
     let userKeys:(keyof Group) []=["id","name","description",'profileImg',"id"];
     Object.keys(select).forEach((key)=>{
@@ -61,7 +64,7 @@ export class GroupsService {
   }
 
   async update(id: number, {profileImg,name,description}: UpdateGroupDto,file?:Express.Multer.File) {
-    //if group doesn't esist throw an error
+    //if group doesn't exist throw an error
     const group = await this.prisma.group.findUnique({where:{id},select:{id:true,profileImg}})
     if(!group){
       throw new HttpException({

@@ -18,7 +18,8 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
         });
         break;
       case 'P2003':
-        status = HttpStatus.CONFLICT;
+      case 'P2025':
+        status = HttpStatus.NOT_FOUND;
         response.status(status).json({
           statusCode: status,
           message: "The resource you want to use doesn't exist",
@@ -26,6 +27,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
         break;
       default:
         console.error('-------------PrismaClientKnownError-----------------------')
+        console.log(exception.code);
         super.catch(exception,host)
         break;
     }

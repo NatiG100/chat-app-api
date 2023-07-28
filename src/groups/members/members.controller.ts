@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters, Request, UseGuards, Query, BadRequestException } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 
 @Controller('groups/:groupId/members')
 export class MembersController {
@@ -12,17 +13,21 @@ export class MembersController {
   }
 
   @Get()
-  findAll() {
-    return this.membersService.findAll();
+  findAll(@Param('groupId') groupId: string) {
+    return this.membersService.findAll(+groupId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.membersService.findOne(+id);
+  @Patch(':id')
+  findOne(@Param('id') id: string,@Param('groupId') groupId: string,@Query('blocked') blocked: "true"|"false") {
+    if(blocked!=="true"&&blocked!=="false"){
+      throw new BadRequestException({message:"Value of blocked must be either `TRUE` or `FALSE`"})
+    }
+    return this.membersService.update(+id,+groupId,blocked==="true");
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.membersService.remove(+id);
+  @UseGuards(AuthenticatedGuard)
+  @Delete()
+  remove(@Request() req:any,@Param('groupId') groupId: string) {
+    return this.membersService.remove(+req.user.id,+groupId);
   }
 }

@@ -35,7 +35,8 @@ export class AuthService {
         }
         //generate new salt and hash
         const {hash,salt} = this.util.hash(newPassword);
-        await this.prisma.user.update({where:{id},data:{hash,salt}})
+        const {hash:h,salt:s,...updatedUser}= await  this.prisma.user.update({where:{id},data:{hash,salt}})
+        return updatedUser;
     }
     async activate(id:number){
         const user = await this.prisma.user.findUnique({where:{id}})
@@ -49,7 +50,7 @@ export class AuthService {
                 throw new UnauthorizedException();
             case 'INACTIVE':
                 await this.prisma.user.update({where:{id},data:{status:'ACTIVE'}});
-                break;
+                return {message:"Your account has been successfully activated"}
             default:
                 throw new HttpException("Internal Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
         }
