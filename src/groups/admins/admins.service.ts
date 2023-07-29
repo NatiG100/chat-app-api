@@ -39,6 +39,11 @@ export class AdminsService {
     }
   }
 
+  remove(userId: number,groupId:number) {
+    return this.prisma.adminGroup.delete({
+      where:{userId_groupId:{userId,groupId}}
+    })
+  }
   removePermission(groupId:number,userId: number, permissionId:number,updateAdminDto: UpdateAdminDto) {
     return this.prisma.userGroupPermission.delete({
       where:{userId_groupId_permissionId:{groupId,permissionId,userId}},
@@ -48,7 +53,4 @@ export class AdminsService {
     return this.prisma.userGroupPermission.create({data:{groupId,permissionId,userId}})
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
-  }
 }

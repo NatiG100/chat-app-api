@@ -17,6 +17,11 @@ export class AdminsController {
     return this.adminsService.findAll(+groupId);
   }
 
+  
+  @Delete(':id')
+  remove(@Param('groupId') groupId:string,@Param('id') id: string) {
+    return this.adminsService.remove(+id,+groupId);
+  }
   @Delete(':id/permissions/:permissionId')
   removePermission(
     @Param('groupId') groupId: string,
@@ -34,10 +39,5 @@ export class AdminsController {
     @Body() updateAdminDto: UpdateAdminDto
   ) {
     return this.adminsService.addPermission(+groupId,+userId,+permissionId, updateAdminDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminsService.remove(+id);
   }
 }
