@@ -17,14 +17,23 @@ export class AdminsController {
     return this.adminsService.findAll(+groupId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminsService.findOne(+id);
+  @Delete(':id/permissions/:permissionId')
+  removePermission(
+    @Param('groupId') groupId: string,
+    @Param('permissionId') permissionId: string,
+    @Param('id') userId: string, 
+    @Body() updateAdminDto: UpdateAdminDto
+  ) {
+    return this.adminsService.removePermission(+groupId,+userId,+permissionId, updateAdminDto);
   }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminsService.update(+id, updateAdminDto);
+  @Post(':id/permissions/:permissionId')
+  addPermission(
+    @Param('groupId') groupId: string,
+    @Param('permissionId') permissionId: string,
+    @Param('id') userId: string, 
+    @Body() updateAdminDto: UpdateAdminDto
+  ) {
+    return this.adminsService.addPermission(+groupId,+userId,+permissionId, updateAdminDto);
   }
 
   @Delete(':id')

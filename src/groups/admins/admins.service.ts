@@ -7,7 +7,7 @@ import { permissions } from 'src/types';
 @Injectable()
 export class AdminsService {
 
-  constructor(private prisma:PrismaService){}
+  constructor(private readonly prisma:PrismaService){}
   async create({userId}: CreateAdminDto,groupId:number) {
     const userGroup = await this.prisma.userGroup.findUnique({where:{userId_groupId:{groupId,userId}}});
     if(!userGroup){
@@ -32,14 +32,6 @@ export class AdminsService {
     groupAdmins.forEach((admin)=>{
       admin.permissions = admin.permissions.map((p)=>(p.permission)) as any
     })
-    
-    // await this.prisma.group.findUnique({select:{
-    //   id:true,
-    //   admins:{select:{user:{select:{id:true,firstName:true,lastName:true,username:true,profileImg:true}},}},
-    //   superAdmin:{
-    //     select:{firstName:true,lastName:true,username:true,profileImg:true}
-    //   }
-    // },where:{id:groupId}})
     if(groupAdmins){
       return groupAdmins
     }else{
@@ -47,12 +39,13 @@ export class AdminsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  removePermission(groupId:number,userId: number, permissionId:number,updateAdminDto: UpdateAdminDto) {
+    return this.prisma.userGroupPermission.delete({
+      where:{userId_groupId_permissionId:{groupId,permissionId,userId}},
+    })
   }
-
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
+  addPermission(groupId:number,userId: number, permissionId:number,updateAdminDto: UpdateAdminDto) {
+    return this.prisma.userGroupPermission.create({data:{groupId,permissionId,userId}})
   }
 
   remove(id: number) {
