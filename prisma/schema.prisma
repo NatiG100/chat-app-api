@@ -78,7 +78,7 @@ model Permission{
 }
 
 model UserGroupPermission{
-  @@id([userId,groupId])
+  @@id([userId,groupId,permissionId])
   adminGroup AdminGroup @relation(fields: [userId,groupId],references: [userId,groupId],onDelete: Cascade)
   userId Int
   groupId Int
