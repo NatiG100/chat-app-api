@@ -7,9 +7,10 @@ import { AuthModule } from './auth/auth.module';
 import { GroupsModule } from './groups/groups.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UtilModule } from './util/util.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
-  imports: [UsersModule,ConfigModule.forRoot({isGlobal:true}), AuthModule, GroupsModule, PrismaModule, UtilModule],
+  imports: [UsersModule,ConfigModule.forRoot({isGlobal:true}), AuthModule, GroupsModule, PrismaModule, UtilModule, MessageModule],
   controllers: [AppController],
   providers: [AppService],
 })

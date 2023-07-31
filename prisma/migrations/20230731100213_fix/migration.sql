@@ -1,0 +1,15 @@
+-- DropForeignKey
+ALTER TABLE "Chat" DROP CONSTRAINT "Chat_user1Id_fkey";
+
+-- DropForeignKey
+ALTER TABLE "Chat" DROP CONSTRAINT "Chat_user2Id_fkey";
+
+-- AlterTable
+ALTER TABLE "Chat" ALTER COLUMN "user1Id" DROP NOT NULL,
+ALTER COLUMN "user2Id" DROP NOT NULL;
+
+-- AddForeignKey
+ALTER TABLE "Chat" ADD CONSTRAINT "Chat_user1Id_fkey" FOREIGN KEY ("user1Id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Chat" ADD CONSTRAINT "Chat_user2Id_fkey" FOREIGN KEY ("user2Id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
