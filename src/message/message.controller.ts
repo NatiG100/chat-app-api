@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
@@ -24,9 +24,9 @@ export class MessageController {
     return this.messageService.sendMessageToGroup(createMessageDto,req.user.id,+to);
   }
 
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
+  @Get('')
+  findAll(@Query('chatId') chatId: string) {
+    return this.messageService.findAll(+chatId);
   }
 
   @Get(':id')

@@ -38,19 +38,19 @@ export class MessageService {
     }
   }
 
-  findAll() {
-    return `This action returns all message`;
+  findAll(chatId:number) {
+    return this.prisma.message.findMany({where:{chatId}})
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} message`;
+    return this.prisma.message.findUnique({where:{id}})
   }
 
   update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
+    return this.prisma.message.update({where:{id},data:{text:updateMessageDto.text}});
   }
 
   remove(id: number) {
-    return `This action removes a #${id} message`;
+    return this.prisma.message.delete({where:{id}})
   }
 }
