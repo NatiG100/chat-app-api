@@ -3,6 +3,7 @@ import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
+import { UserInGroupChatGuard, UserInGroupGuard } from 'src/auth/groupMember.guard';
 
 @Controller('message')
 export class MessageController {
@@ -13,12 +14,12 @@ export class MessageController {
   sendToUser(@Body() createMessageDto: CreateMessageDto,@Request() req:any,@Param('to') to: string) {
     return this.messageService.sendMessageToUser(createMessageDto,req.user.id,+to);
   }
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard,UserInGroupChatGuard)
   @Post(':chat')
   sendToChat(@Body() createMessageDto: CreateMessageDto,@Request() req:any,@Param('chat') chat: string) {
     return this.messageService.sendMessage(createMessageDto,req.user.id,+chat);
   }
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard,UserInGroupGuard)
   @Post('togroup/:to')
   sendToGroup(@Body() createMessageDto: CreateMessageDto,@Request() req:any,@Param('to') to: string) {
     return this.messageService.sendMessageToGroup(createMessageDto,req.user.id,+to);
