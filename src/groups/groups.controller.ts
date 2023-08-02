@@ -5,6 +5,7 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 import { APIFeaturesDto, APIFeaturesSingleDto } from 'src/dto/APIFeaturesDto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SuperAdminGuard } from 'src/auth/superadmin.guard';
 
 @Controller('groups')
 export class GroupsController {
@@ -27,6 +28,7 @@ export class GroupsController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @UseGuards(SuperAdminGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('profileImg'))
   update(@Param('id') id: string,@Body() updateGroupDto: UpdateGroupDto, @UploadedFile(
@@ -41,11 +43,15 @@ export class GroupsController {
     return this.groupsService.update(+id, updateGroupDto,file);
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @UseGuards(SuperAdminGuard)
   @Patch(':id/transfer')
   transfer(@Param('id') id:string,@Query('to') to:string){
     return this.groupsService.transfer(+id,+to);
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @UseGuards(SuperAdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(+id);

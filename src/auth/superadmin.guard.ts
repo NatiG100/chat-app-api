@@ -10,7 +10,7 @@ export class SuperAdminGuard implements CanActivate{
         //get the request object
         const request = context.switchToHttp().getRequest();
         //get group id from request param
-        const groupId = +request.params.groupId as number;
+        const groupId = +request.params.id as number;
         //get userId from user object in request obj
         const userId = request.user.id;
         //if user is the super admin of the group allow him
