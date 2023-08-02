@@ -47,7 +47,7 @@ export class MessageService {
   }
 
   update(id: number, updateMessageDto: UpdateMessageDto) {
-    return this.prisma.message.update({where:{id},data:{text:updateMessageDto.text}});
+    return this.prisma.message.update({where:{id},data:{text:updateMessageDto.text,updatedAt:new Date()}});
   }
 
   remove(id: number) {

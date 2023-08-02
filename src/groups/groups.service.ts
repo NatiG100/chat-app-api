@@ -19,7 +19,7 @@ export class GroupsService {
   create(createGroupDto: CreateGroupDto,myId:number) {
     return this.prisma.$transaction(async(tx)=>{
       const group = await tx.group.create({data:{...createGroupDto,superAdminId:myId}});
-      await tx.userGroup.create({data:{groupId:group.id,userId:myId}})
+      return await tx.userGroup.create({data:{groupId:group.id,userId:myId}})
     })
   }
   //takes a select object and makes sure that it contains only the available fields

@@ -3,5 +3,6 @@ export enum permissions{
     CHANGE_MEMBER_STATUS=2,
     ADD_ADMIN=3,
     REMOVE_ADMIN=4,
-    CHANGE_ADMIN_STATUS=5
+    CHANGE_ADMIN_STATUS=5,
+    FETCH_ADMINS=6
 }

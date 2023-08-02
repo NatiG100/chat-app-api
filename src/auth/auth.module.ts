@@ -9,6 +9,6 @@ import { AuthController } from './Auth.controller';
 @Module({
   imports:[PassportModule.register({session:true})],
   providers: [AuthService,LocalStrategy,SessionSerializer],
-  controllers:[AuthController]
+  controllers:[AuthController],
 })
 export class AuthModule {}

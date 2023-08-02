@@ -22,6 +22,7 @@ export class AdminsService {
       this.prisma.userGroupPermission.create({data:{groupId,userId,permissionId:permissions.ADD_MEMBER}}),
       this.prisma.userGroupPermission.create({data:{groupId,userId,permissionId:permissions.CHANGE_MEMBER_STATUS}})
     ])
+    return {message:"Admin successfully added to the group"}
   }
 
   async findAll(groupId:number) {

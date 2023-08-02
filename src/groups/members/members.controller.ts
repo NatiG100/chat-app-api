@@ -2,11 +2,18 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters, Request,
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { permissions } from 'src/types';
+import { GroupAdminWithRoleGuard } from 'src/auth/groupAdmin.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('groups/:groupId/members')
 export class MembersController {
-  constructor(private readonly membersService: MembersService) {}
+  constructor(private readonly membersService: MembersService,private prisma:PrismaService) {}
 
+  @UseGuards(new AuthenticatedGuard())
+  @Roles(permissions.ADD_MEMBER)
+  @UseGuards(GroupAdminWithRoleGuard)
   @Post()
   create(@Body() createMemberDto: CreateMemberDto,@Param('groupId') groupId: string) {
     return this.membersService.create(createMemberDto,+groupId);
@@ -17,6 +24,9 @@ export class MembersController {
     return this.membersService.findAll(+groupId);
   }
 
+  @UseGuards(new AuthenticatedGuard())
+  @Roles(permissions.CHANGE_MEMBER_STATUS)
+  @UseGuards(GroupAdminWithRoleGuard)
   @Patch(':id')
   findOne(@Param('id') id: string,@Param('groupId') groupId: string,@Query('blocked') blocked: "true"|"false") {
     if(blocked!=="true"&&blocked!=="false"){
