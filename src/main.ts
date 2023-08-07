@@ -7,6 +7,7 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -19,6 +20,7 @@ async function bootstrap() {
       if (!origin || whitelist.indexOf(origin) !== -1) {
         callback(null, true)
       } else {
+        console.log("cors failed")
         callback(new Error('Not allowed by CORS'))
       }
     },
@@ -44,7 +46,7 @@ async function bootstrap() {
     store,
     secret:"Replace it with session secrete",
     resave:false,
-    saveUninitialized:true,
+    saveUninitialized:false,
     name:'qid',
     cookie:{
       secure:false,
@@ -69,6 +71,6 @@ async function bootstrap() {
     forbidNonWhitelisted: true
   }))
 
-  await app.listen(3000);
+  await app.listen(4000);
 }
 bootstrap();
