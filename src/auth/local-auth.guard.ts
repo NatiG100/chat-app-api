@@ -6,7 +6,6 @@ export class LocalAuthGuard extends AuthGuard('local'){
     async canActivate(context:ExecutionContext){
         try{
             const request = context.switchToHttp().getRequest();
-            console.log(request.isAuthenticated())
             if(request.isAuthenticated()){
                 throw new ForbiddenException("You have already loged in")
             }

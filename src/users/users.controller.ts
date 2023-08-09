@@ -61,6 +61,8 @@ export class UsersController {
       fileIsRequired:false
     })
   ) file?:Express.Multer.File) {
+    delete (updateUserDto as any)?.id
+    delete (updateUserDto as any)?.status
     return this.usersService.update(req.session.passport.user.id, updateUserDto,file);
   }
 

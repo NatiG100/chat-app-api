@@ -76,7 +76,7 @@ export class UsersService {
 
   async update(id: number, {profileImg,...otherUpdateDto}: UpdateUserDto,file?:Express.Multer.File) {
     //if user doesn't esist throw an error
-    const user = await this.prisma.user.findUnique({where:{id},select:{id:true,profileImg}})
+    const user = await this.prisma.user.findUnique({where:{id},select:{id:true,profileImg:true}})
     if(!user){
       throw new HttpException({
         status:HttpStatus.NOT_FOUND,
@@ -97,7 +97,7 @@ export class UsersService {
   
       //delete image if it exists
       if(user.profileImg){
-        await deleteFile({uuid:user.profileImg},{authSchema:this.uploadCareAuthSchema})  
+        const deleted = await deleteFile({uuid:user.profileImg},{authSchema:this.uploadCareAuthSchema})  
       }
     }else{
       updatedUser = await this.prisma.user.update({where:{id},data:otherUpdateDto});
