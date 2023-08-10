@@ -50,17 +50,22 @@ export class UsersService {
   async findAll(query:any) {
     let {select,take,skip} = this.util.apiFeatures(query);
     select = this.sanitizeSelect(select);
-    select = {id:true,...select}
+    select = {id:true,...select};
+    type CustomFilter = {contains:string,mode:"insensitive"}
+    let filter:{OR:{firstName?:CustomFilter,lastName?:CustomFilter,username?:CustomFilter}[]}[] = [];
+    if(query.query){
+      const queryString = query.query as string;
+      queryString.split(' ').forEach((q)=>{
+        if(q!==''){
+          filter.push({OR:[{firstName:{contains:q,mode:"insensitive"}},{lastName:{contains:q,mode:"insensitive"}},{username:{contains:q,mode:"insensitive"}}]})
+        }
+      })
+    }
     const [users,totalCount] = await this.prisma.$transaction([
-      this.prisma.user.findMany({select,take,skip,where:{OR:[
-        {
-          OR:[
-            {firstName:{contains:query.query}},
-            {lastName:{contains:query.query}}
-          ]
+      this.prisma.user.findMany({select,take,skip,where:{
+          OR:filter
         },
-        {username:{contains:query.query}}
-      ]}}),
+    }),
       this.prisma.user.count(),
     ]);
     return {
