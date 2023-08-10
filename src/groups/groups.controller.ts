@@ -18,6 +18,7 @@ export class GroupsController {
   }
 
   @Get()
+  @UseGuards(AuthenticatedGuard)
   findAll(@Query() query:APIFeaturesDto) {
     return this.groupsService.findAll(query);
   }

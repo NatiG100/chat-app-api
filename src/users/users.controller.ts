@@ -37,12 +37,14 @@ export class UsersController {
   }
 
   //fetch many users
+  @UseGuards(AuthenticatedGuard)
   @Get()
   findAll(@Query() query:APIFeaturesDto) {
     return this.usersService.findAll(query);
   }
 
   //fetch one user
+  @UseGuards(AuthenticatedGuard)
   @Get(':id')
   findOne(@Param('id') id: string, @Query() query:APIFeaturesSingleDto) {
     return this.usersService.findOne(+id,query);
@@ -66,6 +68,7 @@ export class UsersController {
     return this.usersService.update(req.session.passport.user.id, updateUserDto,file);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Patch(':id/status')
   async changeStatus(@Param('id') id:string,@Body() status: ChangeUserStatusDto){
     return this.usersService.changeStatus(+id,status)

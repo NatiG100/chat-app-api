@@ -52,7 +52,15 @@ export class UsersService {
     select = this.sanitizeSelect(select);
     select = {id:true,...select}
     const [users,totalCount] = await this.prisma.$transaction([
-      this.prisma.user.findMany({select,take,skip}),
+      this.prisma.user.findMany({select,take,skip,where:{OR:[
+        {
+          OR:[
+            {firstName:{contains:query.query}},
+            {lastName:{contains:query.query}}
+          ]
+        },
+        {username:{contains:query.query}}
+      ]}}),
       this.prisma.user.count(),
     ]);
     return {

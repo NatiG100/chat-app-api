@@ -25,21 +25,24 @@ export class MessageController {
     return this.messageService.sendMessageToGroup(createMessageDto,req.user.id,+to);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('')
   findAll(@Query('chatId') chatId: string) {
     return this.messageService.findAll(+chatId);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.messageService.findOne(+id);
   }
-
+  @UseGuards(AuthenticatedGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
     return this.messageService.update(+id, updateMessageDto);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.messageService.remove(+id);
