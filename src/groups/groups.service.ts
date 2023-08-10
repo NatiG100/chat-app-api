@@ -24,7 +24,7 @@ export class GroupsService {
   }
   //takes a select object and makes sure that it contains only the available fields
   private sanitizeSelect(select:object){
-    let userKeys:(keyof Group) []=["id","name","description",'profileImg',"id"];
+    let userKeys:(keyof Group) []=["id","name","description",'profileImg',"id","link"];
     Object.keys(select).forEach((key)=>{
       if(!userKeys.includes(key as keyof Group)){
         delete select[key]
@@ -40,8 +40,18 @@ export class GroupsService {
     let {select,take,skip} = this.util.apiFeatures(query);
     select = this.sanitizeSelect(select);
     select = {id:true,...select}
+    type CustomFilter = {contains:string,mode:"insensitive"}
+    let filter:{OR:{name?:CustomFilter}[]}[] = [];
+    if(query.query){
+      const queryString = query.query as string;
+      queryString.split(' ').forEach((q)=>{
+        if(q!==''){
+          filter.push({OR:[{name:{contains:q,mode:"insensitive"}}]})
+        }
+      })
+    }
     const [groups,totalCount] = await this.prisma.$transaction([
-      this.prisma.group.findMany({select,take,skip}),
+      this.prisma.group.findMany({select,take,skip,where:{OR:[...filter,{link:{equals:query.query}}]}}),
       this.prisma.group.count(),
     ]);
     return {
