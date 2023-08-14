@@ -15,6 +15,11 @@ export class ChatController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Get(":id")
+  findOne(@Param('id') id: string,@Request() req:any){
+    return this.chatService.findOne(req.user.id,+id);
+  }
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
   remove(@Param('id') id: string,@Request() req:any) {
     return this.chatService.remove(req.user.id, +id);
