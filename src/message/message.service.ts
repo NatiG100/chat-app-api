@@ -39,7 +39,7 @@ export class MessageService {
   }
 
   findAll(chatId:number) {
-    return this.prisma.message.findMany({where:{chatId}})
+    return this.prisma.message.findMany({where:{chatId},include:{user:{select:{profileImg:true,firstName:true,lastName:true}}}})
   }
 
   findOne(id: number) {
