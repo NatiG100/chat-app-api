@@ -20,6 +20,16 @@ export class ChatController {
     return this.chatService.findOne(req.user.id,+id);
   }
   @UseGuards(AuthenticatedGuard)
+  @Get("withuser/:userId")
+  chatWithUser(@Param('userId') userId: string,@Request() req:any){
+    return this.chatService.getChatWithUser(req.user.id,+userId);
+  }
+  @UseGuards(AuthenticatedGuard)
+  @Get("ingroup/:groupId")
+  chatWithGroup(@Param('groupId') groupId: string,@Request() req:any){
+    return this.chatService.getChatInGroup(req.user.id,+groupId)
+  }
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
   remove(@Param('id') id: string,@Request() req:any) {
     return this.chatService.remove(req.user.id, +id);
