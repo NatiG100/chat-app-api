@@ -15,9 +15,25 @@ export class MembersService {
   async findAll(groupId:number) {
     const groupMembers = await this.prisma.group.findUnique({select:{
       id:true,
-      members:{select:{user:{select:{id:true,firstName:true,lastName:true,username:true,profileImg:true}},blocked:true,}},
+      members:{
+        select:{
+          user:{
+            select:{
+              id:true,
+              firstName:true,
+              lastName:true,
+              username:true,
+              profileImg:true
+            }
+          },
+          blocked:true,
+        }
+      },
       superAdmin:{
-        select:{firstName:true,lastName:true,username:true,profileImg:true}
+        select:{id:true,firstName:true,lastName:true,username:true,profileImg:true}
+      },
+      admins:{
+        select:{permissions:{select:{permission:true}},userId:true}
       }
     },where:{id:groupId}})
     if(groupMembers){
