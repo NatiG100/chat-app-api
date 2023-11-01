@@ -21,7 +21,6 @@ export class AdminsController {
   @UseGuards(new AuthenticatedGuard())
   @Roles(permissions.FETCH_ADMINS)
   @UseGuards(GroupAdminWithRoleGuard)
-  @Post()
   @Get()
   findAll(@Param('groupId') groupId: string) {
     return this.adminsService.findAll(+groupId);
@@ -30,7 +29,6 @@ export class AdminsController {
   @UseGuards(new AuthenticatedGuard())
   @Roles(permissions.REMOVE_ADMIN)
   @UseGuards(GroupAdminWithRoleGuard)
-  @Post()
   @Delete(':id')
   remove(@Param('groupId') groupId:string,@Param('id') id: string) {
     return this.adminsService.remove(+id,+groupId);
@@ -38,7 +36,6 @@ export class AdminsController {
   @UseGuards(new AuthenticatedGuard())
   @Roles(permissions.CHANGE_ADMIN_STATUS)
   @UseGuards(GroupAdminWithRoleGuard)
-  @Post()
   @Delete(':id/permissions/:permissionId')
   removePermission(
     @Param('groupId') groupId: string,
@@ -51,7 +48,6 @@ export class AdminsController {
   @UseGuards(new AuthenticatedGuard())
   @Roles(permissions.CHANGE_ADMIN_STATUS)
   @UseGuards(GroupAdminWithRoleGuard)
-  @Post()
   @Post(':id/permissions/:permissionId')
   addPermission(
     @Param('groupId') groupId: string,

@@ -28,13 +28,23 @@ export class AdminsService {
   async findAll(groupId:number) {
     const groupAdmins = await this.prisma.adminGroup.findMany({
       where:{groupId},
-      include:{user:{select:{id:true,firstName:true,lastName:true,profileImg:true,username:true}},permissions:{select:{permission:{}}},}
+      include:{
+        user:{select:{id:true,firstName:true,lastName:true,profileImg:true,username:true}},permissions:{select:{permission:{}}},
+        group:{select:{superAdmin:{select:{id:true,firstName:true,lastName:true,profileImg:true,username:true}}}}
+      }
     });
+    const superAdmin = await this.prisma.group.findUnique({
+      where:{id:groupId},
+      select:{superAdmin:{select:{id:true,firstName:true,lastName:true,profileImg:true,username:true}}}
+    })
     groupAdmins.forEach((admin)=>{
       admin.permissions = admin.permissions.map((p)=>(p.permission)) as any
     })
     if(groupAdmins){
-      return groupAdmins
+      return {
+        admins:groupAdmins,
+        superAdmin:superAdmin.superAdmin
+      }
     }else{
       throw new NotFoundException("Group with this id was not found")
     }
