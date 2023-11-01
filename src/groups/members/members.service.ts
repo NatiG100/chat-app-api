@@ -27,6 +27,9 @@ export class MembersService {
             }
           },
           blocked:true,
+        },
+        orderBy:{
+          userId:'asc'
         }
       },
       superAdmin:{
@@ -35,7 +38,9 @@ export class MembersService {
       admins:{
         select:{permissions:{select:{permission:true}},userId:true}
       }
-    },where:{id:groupId}})
+    },
+    where:{id:groupId},
+  })
     if(groupMembers){
       return groupMembers
     }else{
