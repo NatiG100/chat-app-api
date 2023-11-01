@@ -57,19 +57,29 @@ export class UsersService {
       const queryString = query.query as string;
       queryString.split(' ').forEach((q)=>{
         if(q!==''){
-          filter.push({OR:[{firstName:{contains:q,mode:"insensitive"}},{lastName:{contains:q,mode:"insensitive"}},{username:{contains:q,mode:"insensitive"}}]})
+          filter.push({
+            OR:[
+              {firstName:{contains:q,mode:"insensitive"}},
+              {lastName:{contains:q,mode:"insensitive"}},
+              {username:{contains:q,mode:"insensitive"}}
+            ]
+          })
         }
       })
     }
-    const [users,totalCount] = await this.prisma.$transaction([
-      this.prisma.user.findMany({select,take,skip,where:{
-          OR:filter
-        },
-    }),
-      this.prisma.user.count(),
+    let whereObj:any = {
+
+    }
+    if(query.query){
+      whereObj.where = {
+        OR:filter
+      };
+    }
+    const [users] = await this.prisma.$transaction([
+      this.prisma.user.findMany({select,take,skip,...whereObj})
     ]);
     return {
-      meta:{totalCount},
+      meta:{totalCount:users?.length},
       data:users.map((user)=>(this.exclude(user,['hash','salt'])))
     }
   }
